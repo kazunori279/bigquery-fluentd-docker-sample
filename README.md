@@ -38,7 +38,7 @@ $ gcloud auth login
 $ bq mk YOUR_PROJECT_ID:bq_test
 ```
 
-- Create a file [schema.json](https://github.com/kazunori279/dockerfiles/blob/master/fluentd-bigquery-sample/schema.json) at your current directory with the following content:
+- Create a file [schema.json](https://github.com/kazunori279/bigquery-fluentd-docker-sample/blob/master/schema.json) at your current directory with the following content:
 
 ```
 [

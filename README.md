@@ -38,7 +38,7 @@ $ gcloud auth login
 $ bq mk YOUR_PROJECT_ID:bq_test
 ```
 
-- Create a file [schema.json](https://github.com/kazunori279/bigquery-fluentd-docker-sample/blob/master/schema.json) at your current directory with the following content:
+- Create a file [schema.json](schema.json) at your current directory with the following content:
 
 ```
 [
@@ -141,7 +141,7 @@ That's it! You've just confirmed the nginx log are collected by Fluentd, importe
 
 ## Inside Dockerfile and td-agent.conf
 
-If you take a look at the [Dockerfile](https://github.com/kazunori279/bigquery-fluentd-docker-sample/blob/master/Dockerfile), you can learn how the Docker container has been configured. After preparing an Ubuntu image, it installs Fluentd, nginx and the bigquery plugin.
+If you take a look at the [Dockerfile](Dockerfile), you can learn how the Docker container has been configured. After preparing an Ubuntu image, it installs Fluentd, nginx and the bigquery plugin.
 
 ```
 FROM ubuntu:12.04
@@ -173,7 +173,7 @@ EXPOSE 80
 ENTRYPOINT /etc/init.d/td-agent restart && /etc/init.d/nginx start && /bin/bash
 ```
 
-In the [td-agent.conf](https://github.com/kazunori279/bigquery-fluentd-docker-sample/blob/master/td-agent.conf) file, you can see how to configure it to forward Fluentd logs to BigQuery plugin. It's as simple as the following:
+In the [td-agent.conf](td-agent.conf) file, you can see how to configure it to forward Fluentd logs to BigQuery plugin. It's as simple as the following:
 
 ```
 <match nginx.access>
@@ -203,4 +203,6 @@ gcloud compute instances delete bq-test --zone=us-central1-a
 
 - On BigQuery Browser Tool, click the drop down menu of `bq_test` dataset and select `Delete dataset`
 
+## License
 
+* See [LICENSE](LICENSE)

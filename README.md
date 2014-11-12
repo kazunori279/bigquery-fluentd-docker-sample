@@ -1,6 +1,6 @@
 # Fluentd + Google BigQuery Getting Started Sample
 
-This sample explains how to set up a [Fluentd](http://www.fluentd.org/) + [Google BigQuery](https://cloud.google.com/bigquery/) integration in a [Docker](https://www.docker.com/) container that sends [nginx](http://nginx.org/en/) web server access log to the BigQuery in real time. The whole process may take only 20 - 30 minutes with the following steps:
+This sample explains how to set up a [Fluentd](http://www.fluentd.org/) + [Google BigQuery](https://cloud.google.com/bigquery/) integration in a [Docker](https://www.docker.com/) container that sends [nginx](http://nginx.org/en/) web server access log to the BigQuery in real time with [fluent-plugin-bigquery](https://github.com/kaizenplatform/fluent-plugin-bigquery). The whole process may take only 20 - 30 minutes with the following steps:
 
 - Sign Up for BigQuery
 - Creating a dataset and table on Google BigQuery
@@ -141,7 +141,7 @@ That's it! You've just confirmed the nginx log are collected by Fluentd, importe
 
 ## Inside Dockerfile and td-agent.conf
 
-If you take a look at the [Dockerfile](Dockerfile), you can learn how the Docker container has been configured. After preparing an Ubuntu image, it installs Fluentd, nginx and the bigquery plugin.
+If you take a look at the [Dockerfile](Dockerfile), you can learn how the Docker container has been configured. After preparing an Ubuntu image, it installs Fluentd, nginx and the [fluent-plugin-bigquery](https://github.com/kaizenplatform/fluent-plugin-bigquery).
 
 ```
 FROM ubuntu:12.04
@@ -173,7 +173,7 @@ EXPOSE 80
 ENTRYPOINT /etc/init.d/td-agent restart && /etc/init.d/nginx start && /bin/bash
 ```
 
-In the [td-agent.conf](td-agent.conf) file, you can see how to configure it to forward Fluentd logs to BigQuery plugin. It's as simple as the following:
+In the [td-agent.conf](td-agent.conf) file, you can see how to configure it to forward Fluentd logs to fluent-plugin-bigquery. It's as simple as the following:
 
 ```
 <match nginx.access>

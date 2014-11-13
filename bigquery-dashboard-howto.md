@@ -4,7 +4,7 @@ BigQuery Dashboard is a Google Spreadsheet that can execute [Google BigQuery](ht
 
 ## Features
 
-- It's a **Google Spreadsheet**: hosted by Google at free, easy to customize and integrate with your business process even for non-programmers. Copy the spreadsheet, click some buttons as in Getting Started, and it's ready to use
+- It's a **Google Spreadsheet**: hosted by Google at free, easy to customize and integrate with your business process even for non-programmers. Copy the spreadsheet, click some buttons as described in Getting Started, and then it's ready to use
 
 - Easy **Big Data** analytics with BigQuery: you can execute BigQuery query just by entering a SQL on a sheet. The Dashboard will automatically execute it every minute/hour and draw a chart from the result. By combining the BigQuery with Norikra, you could have both real-time view and historical view of your big data on the same Dashboard
 

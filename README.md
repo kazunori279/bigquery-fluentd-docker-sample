@@ -10,6 +10,7 @@ This sample explains how to set up a [Fluentd](http://www.fluentd.org/) + [Googl
 - (Optional) Using BigQuery Dashboard
 
 ![gsod_graph.png](images/gsod_graph.png)
+
 The logs can be visualized easily by using [BigQuery Dashboard](bigquery-dashboard-howto.md)
 
 ## Sign Up for BigQuery

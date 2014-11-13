@@ -18,8 +18,8 @@ To start using BigQuery Dashboard, follow the instruction below.
 1. On the Script editor, open `bq_query.gs`. Paste the copied URL on the place of `<<PLEASE PUT YOUR SPREADSHEET URL HERE>>`. Select `File` - `Save` menu to save the file
 1. Paste Project ID of your Google Cloud Platform project on the place of `<<PLEASE PUT YOUR PROJECT ID HERE>>`. Select `File` - `Save` menu to save the file
 1. Select `Resources` - `Advanced Google services` menu and turn on `BigQuery API`
-1. Click `Google Developers Console` link of the dialog. This will show a list of APIs. Find `BigQuery API` and click `OFF` button to enable it
-1. Close the Console, click OK button of the dialog
+1. Click `Google Developers Console` link on the dialog. This will show a list of APIs. Find `BigQuery API` and click `OFF` button to enable it. You will see `BigQuery API` on the `Enabled APIs` list on the top of the page
+1. Close the Console, click `OK` button of the dialog
 
 ### Execute a sample query:
 

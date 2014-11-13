@@ -143,6 +143,9 @@ That's it! You've just confirmed the nginx log are collected by Fluentd, importe
 
 [BigQuery Dashboard](bigquery-dashboard-howto.md) lets you easily write some queries on Google Spreadsheet and execute it periodically (e.g. every minute, hour, or day). Please see [BigQuery Dashboard How-To](bigquery-dashboard-howto.md) to learn how to use the dashboard.
 
+![gsod_graph.png](images/gsod_graph.png)
+![gsod_query.png](images/gsod_query.png)
+
 ## Inside Dockerfile and td-agent.conf
 
 If you take a look at the [Dockerfile](Dockerfile), you can learn how the Docker container has been configured. After preparing an Ubuntu image, it installs Fluentd, nginx and the [fluent-plugin-bigquery](https://github.com/kaizenplatform/fluent-plugin-bigquery).

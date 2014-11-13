@@ -9,9 +9,9 @@ This sample explains how to set up a [Fluentd](http://www.fluentd.org/) + [Googl
 - Execute BigQuery query
 - (Optional) Using BigQuery Dashboard
 
-![gsod_graph.png](images/gsod_graph.png)
+The logs collected by Fluentd can be aggregated by BigQuery, and visualized by [BigQuery Dashboard](bigquery-dashboard-howto.md) easily:
 
-The logs can be visualized easily by using [BigQuery Dashboard](bigquery-dashboard-howto.md)
+![gsod_graph.png](images/gsod_graph.png)
 
 ## Sign Up for BigQuery
 

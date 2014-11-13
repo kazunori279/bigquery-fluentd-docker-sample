@@ -7,6 +7,7 @@ This sample explains how to set up a [Fluentd](http://www.fluentd.org/) + [Googl
 - Creating an instance of Google Compute Engine (GCE)
 - Run nginx + Fluentd with Docker container
 - Execute BigQuery query
+- (Optional) Using BigQuery Dashboard
 
 ## Sign Up for BigQuery
 

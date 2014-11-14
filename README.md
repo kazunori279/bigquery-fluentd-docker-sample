@@ -2,12 +2,11 @@
 
 This sample explains how to set up a [Fluentd](http://www.fluentd.org/) + [Google BigQuery](https://cloud.google.com/bigquery/) integration in a [Docker](https://www.docker.com/) container that sends [nginx](http://nginx.org/en/) web server access log to the BigQuery in real time with [fluent-plugin-bigquery](https://github.com/kaizenplatform/fluent-plugin-bigquery). The whole process may take only 20 - 30 minutes with the following steps:
 
-- Sign Up for BigQuery
+- Sign Up for Google Cloud Platform and BigQuery Service
 - Creating a dataset and table on Google BigQuery
-- Creating an instance of Google Compute Engine (GCE)
-- Run nginx + Fluentd with Docker container
+- Run nginx + Fluentd on Google Compute Engine (GCE) in a Docker container
 - Execute BigQuery query
-- (Optional) Using BigQuery Dashboard
+- (Optional) Using BigQuery Dashboard built with Google Sheets
 
 The logs collected by Fluentd can be aggregated by BigQuery, and visualized by [BigQuery Dashboard](bigquery-dashboard-howto.md) easily:
 
@@ -61,7 +60,7 @@ cd bigquery-fluentd-docker-sample
 - Execute the following command to create the table `access_log`.
 
 ```
-$ bq mk -t YOUR_PROJECT_ID:bq_test.access_log ./schema.json
+$ bq mk -t bq_test.access_log ./schema.json
 ```
 
 - Reload the BigQuery Browser Tool page, select your project, `bq_test` dataset and `access_log` table. Confirm that the table has been created with the specified schema correctly.
@@ -70,13 +69,18 @@ $ bq mk -t YOUR_PROJECT_ID:bq_test.access_log ./schema.json
 
 - Run the following command to create a GCE instance named `bq-test`. This will take around 30 secs.
 
+For more information about the features of GCE instances and their features,
+see the [product documentation](https://cloud.google.com/compute/docs/instances)
+
 ```
 $ gcloud compute instances create "bq-test" \
-  --zone "us-central1-a" --machine-type "n1-standard-1" \
-  --network "default" --maintenance-policy "MIGRATE" \
-  --scopes "https://www.googleapis.com/auth/devstorage.read_only" \
-  "https://www.googleapis.com/auth/bigquery" \
-  --image container-vm-v20140929 --image-project google-containers
+--zone "us-central1-a"  \
+--machine-type "n1-standard-1"  \
+--network "default" \
+--maintenance-policy "MIGRATE"  \
+--scopes storage-ro bigquery \
+--image container-vm-v20140929 \
+--image-project google-containers
 ```
 
 ## Run nginx + Fluentd with Docker container
@@ -93,25 +97,31 @@ $ gcloud compute ssh bq-test --zone=us-central1-a
 $ sudo docker run -e GCP_PROJECT="YOUR_PROJECT_ID" -p 80:80 -t -i -d kazunori279/fluentd-bigquery-sample
 ```
 
+This will launch a run a docker container preconfigured with nginx and fluentd,
+this docker container is described in more detail below. We now want to
+generate some page views so that we can verify that fluentd is sending data to
+BigQuery.
+
 - Open [Google Developers Console](https://console.developers.google.com/project) on a browser, choose your project and select `Compute` - `Compute Engine` - `VM instances`.
 
-- Find `bq-test` GCE instance and click it's external IP link. On the dialog, select `Allow HTTP traffic` and click `Apply` to add the firewall rule. There will be an Activities dialow shown on the display with a message `Updating instance tags for "bq-test"`.
+- Find `bq-test` GCE instance and click it's external IP link. On the dialog, select `Allow HTTP traffic` and click `Apply` to add the firewall rule. There will be an Activities dialog shown in the bottom right of the window with a message `Updating instance tags for "bq-test"`.
 
-- After updating instance tags, click the external IP link again to access nginx server on the instance. It will show a blank web page titled "Welcome to nginx!". Click reload button several times.
+- After updating instance tags, click the external IP link again to direct your browser to hit the nginx server on the instance. It will show a blank web page titled "Welcome to nginx!". Click reload button several times.
+
 
 ## Execute BigQuery query
 
-- Open BigQuery Browser Tool, click `COMPOSE QUERY` and execute the following query. You will see the requests from browser are recorded on access_log table (it may take a few minutes to receive the log for the first time).
+- Open BigQuery Browser Tool, click `COMPOSE QUERY` and execute the following query. You will see the requests from browser are recorded on access_log table (it may take a few minutes to receive the very first log entries from fluentd).
 
 ```
 SELECT * FROM [bq_test.access_log] LIMIT 1000
 ```
 
-That's it! You've just confirmed the nginx log are collected by Fluentd, imported to BigQuery and shown on the Browser Tool. You may use Apache Bench tool or etc to hit the web page with more traffic to see how Fluentd + BigQuery can handle high volume logs in real time. It can support up to 10K rows/sec by default (and you can extend it to 100K rows/sec by requesting).
+That's it! You've just confirmed that nginx access log events are collected by Fluentd, imported into BigQuery and visible in the Browser Tool. You may use Apache Bench tool or etc to hit the web page with more traffic to see how Fluentd + BigQuery can handle high volume logs in real time. It can support up to 10K rows/sec by default (and you can extend it to 100K rows/sec by requesting).
 
 ## Using BigQuery Dashboard
 
-[BigQuery Dashboard](bigquery-dashboard-howto.md) lets you easily write some queries on Google Spreadsheet and execute it periodically (e.g. every minute, hour, or day). 
+Using Google Sheets and the BigQuery connector, you can create a [BigQuery Dashboard](bigquery-dashboard-howto.md) which lets you easily write and visualize queries periodically (e.g. every minute, hour, or day). See [BigQuery Dashboard How-To](bigquery-dashboard-howto.md) to learn how to set this up.
 
 - Follow the steps described in [BigQuery Dashboard How-To](bigquery-dashboard-howto.md) to set up a dashboard, including the automatic query execution section.
 
@@ -189,7 +199,19 @@ In the [td-agent.conf](td-agent.conf) file, you can see how to configure it to f
 </match>
 ```
 
-Since you are running the GCE instance within the same GCP project of BigQuery dataset, you don't have to copy any private key file to the GCE instance for OAuth2 authentication. ` "#{ENV['GCP_PROJECT']}"` refers to your project id passed through the environment variable.
+Since you are running the GCE instance within the same GCP project of BigQuery dataset, you don't have to copy any private key file to the GCE instance for OAuth2 authentication. ` "#{ENV['GCP_PROJECT']}"` refers to your project id passed through the environment variable you gave as an argument when starting the docker container.
+
+You can also use fluentd to send data from compute instances running outside of
+the project, or outside of GCE entirely. To authorize the fluentd BigQuery plugin, you will need the
+private key and email for a Google API [Service Account](https://developers.google.com/accounts/docs/OAuth2ServiceAccount).
+
+- Go to your project in the Developer Console and open the Credentials section
+  of APIs & auth project console.
+- Choose to "Create new Client ID" and choose "Service Account"
+- Download the install the private key with fluentd on the host, and use the
+  account email in the [fluentd plugin settings](https://github.com/kaizenplatform/fluent-plugin-bigquery#authentication).
+- Note that this service account has access to the resources of the project, so
+  it should only be distributed on trusted machines.
 
 ## Cleaning Up
 

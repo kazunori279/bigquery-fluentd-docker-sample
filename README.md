@@ -13,14 +13,15 @@ The logs collected by Fluentd can be aggregated by BigQuery, and visualized by [
 
 ![gsod_graph.png](images/gsod_graph.png)
 
-## Sign Up for BigQuery
+## Sign Up for Google Cloud Platform
 
 (You can skip this section if you have done before)
 
-- If you have not signed up with BigQuery yet, follow the instruction in [Sign Up for BigQuery](https://cloud.google.com/bigquery/sign-up) page to create a project.
-- Note the hyphenated PROJECT ID, which will be different than the project
-  name.
-- To set up a billing, select the project, click `Billing & settings` and `Enable billing` button. Enter billing profile accordingly.
+- If you don't already have one, sign up for a [Google account](https://accounts.google.com/SignUp).
+- Go to the [Google Developers Console](https://console.developers.google.com/?_ga=1.200477227.420342054.1415120486).
+- Select your target project. If you want to create a new project, click on Create Project.
+- BigQuery is automatically enabled in new projects. To activate BigQuery in a pre-existing project, click APIS & AUTH in the left navigation, then click APIs. Navigate to BigQuery API. If the status indicator says OFF, click the indicator once to switch it to ON.
+- Set up billing. BigQuery offers a free tier for queries, but other operations require billing to be set up before you can use the service.
 - Open [BigQuery Browser Tool](https://console.developers.google.com/)
 - Click `COMPOSE QUERY` button at top left and execute the following sample query with the tool to check you can access BigQuery.
 
@@ -42,7 +43,7 @@ $ gcloud auth login
 - Set the project you are working on with the project ID noted earlier
 
 ```
-$ gcloud config set project <PROJECT ID>
+$ gcloud config set project <YOUR PROJECT ID>
 ```
 
 - Create a dataset `bq-test` by executing the following command:
@@ -66,13 +67,6 @@ $ bq mk -t YOUR_PROJECT_ID:bq_test.access_log ./schema.json
 - Reload the BigQuery Browser Tool page, select your project, `bq_test` dataset and `access_log` table. Confirm that the table has been created with the specified schema correctly.
 
 ## Creating a Google Compute Engine instance
-
-- If you have not signed up with GCE yet, follow the instruction in [Sign Up for Google Compute Engine](https://cloud.google.com/compute/docs/signup) page to enable GCE.
-- Run the follwoing command to set default project to your project id.
-
-```
-$ gcloud config set project YOUR_PROJECT_ID
-```
 
 - Run the following command to create a GCE instance named `bq-test`. This will take around 30 secs.
 

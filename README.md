@@ -18,6 +18,8 @@ The logs collected by Fluentd can be aggregated by BigQuery, and visualized by [
 (You can skip this section if you have done before)
 
 - If you have not signed up with BigQuery yet, follow the instruction in [Sign Up for BigQuery](https://cloud.google.com/bigquery/sign-up) page to create a project.
+- Note the hyphenated PROJECT ID, which will be different than the project
+  name.
 - To set up a billing, select the project, click `Billing & settings` and `Enable billing` button. Enter billing profile accordingly.
 - Open [BigQuery Browser Tool](https://console.developers.google.com/)
 - Click `COMPOSE QUERY` button at top left and execute the following sample query with the tool to check you can access BigQuery.
@@ -37,53 +39,22 @@ To create a dataset and table, you need to install `bq` command tool included in
 $ gcloud auth login
 ```
 
+- Set the project you are working on with the project ID noted earlier
+
+```
+$ gcloud config set project <PROJECT ID>
+```
+
 - Create a dataset `bq-test` by executing the following command:
 
 ```
-$ bq mk YOUR_PROJECT_ID:bq_test
+$ bq mk bq_test
 ```
 
-- Create a file [schema.json](schema.json) at your current directory with the following content:
+- `cd` into the directory for this repository if you are not already.
 
 ```
-[
-  {
-    "name": "agent",
-    "type": "STRING"
-  },
-  {
-    "name": "code",
-    "type": "STRING"
-  },
-  {
-    "name": "host",
-    "type": "STRING"
-  },
-  {
-    "name": "method",
-    "type": "STRING"
-  },
-  {
-    "name": "path",
-    "type": "STRING"
-  },
-  {
-    "name": "referer",
-    "type": "STRING"
-  },
-  {
-    "name": "size",
-    "type": "INTEGER"
-  },
-  {
-    "name": "user",
-    "type": "STRING"
-  },
-  {
-    "name": "time",
-    "type": "INTEGER"
-  }
-]
+cd bigquery-fluentd-docker-sample
 ```
 
 - Execute the following command to create the table `access_log`.

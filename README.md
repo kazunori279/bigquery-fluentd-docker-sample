@@ -8,9 +8,7 @@ This sample explains how to set up a [Fluentd](http://www.fluentd.org/) + [Googl
 - Execute BigQuery query
 - (Optional) Using BigQuery Dashboard built with Google Sheets
 
-The logs collected by Fluentd can be aggregated by BigQuery, and visualized by [BigQuery Dashboard](bigquery-dashboard-howto.md) easily:
-
-![gsod_graph.png](images/gsod_graph.png)
+The logs collected by Fluentd can be aggregated by BigQuery, and visualized by BigQuery Dashboard easily:
 
 ## Sign Up for Google Cloud Platform
 

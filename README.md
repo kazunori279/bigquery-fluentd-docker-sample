@@ -144,11 +144,33 @@ SELECT * FROM [bq_test.access_log] LIMIT 1000
 
 That's it! You've just confirmed the nginx log are collected by Fluentd, imported to BigQuery and shown on the Browser Tool. You may use Apache Bench tool or etc to hit the web page with more traffic to see how Fluentd + BigQuery can handle high volume logs in real time. It can support up to 10K rows/sec by default (and you can extend it to 100K rows/sec by requesting).
 
-## (Optional) Using BigQuery Dashboard
+## Using BigQuery Dashboard
 
-[BigQuery Dashboard](bigquery-dashboard-howto.md) lets you easily write some queries on Google Spreadsheet and execute it periodically (e.g. every minute, hour, or day). Please see [BigQuery Dashboard How-To](bigquery-dashboard-howto.md) to learn how to use the dashboard.
+[BigQuery Dashboard](bigquery-dashboard-howto.md) lets you easily write some queries on Google Spreadsheet and execute it periodically (e.g. every minute, hour, or day). 
 
-![gsod_query.png](images/gsod_query.png)
+- Follow the steps described in [BigQuery Dashboard How-To](bigquery-dashboard-howto.md) to set up a dashboard, including the automatic query execution section.
+
+- Add the following query on `BQ Queries` sheet with a query name `access_log_LINE` and interval `1` min.
+
+```
+SELECT
+  STRFTIME_UTC_USEC(time * 1000000, "%Y-%m-%d %H:%M:%S") as tstamp, 
+  count(*) as rps
+FROM bq_test.access_log
+GROUP BY tstamp ORDER BY tstamp DESC;
+```
+
+- (assuming you are using Mac OS or Linux) Open a local terminal and execute the following command to execute Apache Bench to hit the nginx with high traffic. Replace `YOUR_EXTERNAL_IP` with the external IP of the GCE instance.
+
+```
+ab -c 100 -n 1000000 http://YOUR_EXTERNAL_IP/
+```
+
+- Open the `BigQuery Dashboard` and select `Dashboard` - `Run All BQ Queries` on the menu. You will see a graph `access_log` is drawn on the dashboard. This graph will be refreshed every one minute.
+
+![access_log graph](images/access_log_graph.png)
+
+- Stop the Apache Bench command by pressing `Ctrl+C`.
 
 ## Inside Dockerfile and td-agent.conf
 

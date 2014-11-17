@@ -16,7 +16,7 @@ RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt
 # update, curl, sudo
 RUN apt-get update && apt-get -y upgrade
 RUN apt-get -y install curl 
-RUN apt-get install sudo
+RUN apt-get -y install sudo
 
 # fluentd
 RUN curl -O http://packages.treasure-data.com/debian/RPM-GPG-KEY-td-agent && apt-key add RPM-GPG-KEY-td-agent && rm RPM-GPG-KEY-td-agent

@@ -114,8 +114,8 @@ SELECT * FROM [bq_test.access_log] LIMIT 1000
 ```
 
 *Note: If you are moving quickly, the first query results may be empty.
-A BigQuery table has a warm-up time for the very first inserts. Once this is
-done, subsequent inserts happen nearly instantly.*
+A BigQuery table has a warm-up time for the very first inserts to appear. Once this is
+done, subsequent inserts appear in results very quickly.*
 
 That's it! You've just confirmed that nginx access log events are collected by Fluentd, imported into BigQuery and visible in the Browser Tool. You may use Apache Bench tool or etc to hit the web page with more traffic to see how Fluentd + BigQuery can handle high volume logs in real time. It can support up to 10K rows/sec by default (and you can extend it to 100K rows/sec by requesting).
 

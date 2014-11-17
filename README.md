@@ -15,12 +15,12 @@ The logs collected by Fluentd can be aggregated by BigQuery, and visualized by B
 (You can skip this section if you have already set up a Google Cloud Project)
 
 - If you don't already have one, sign up for a [Google account](https://accounts.google.com/SignUp).
-- Go to the [Google Developers Console](https://console.developers.google.com/?_ga=1.200477227.420342054.1415120486).
+- Go to the [Google Developers Console](https://console.developers.google.com/project).
 - Select your target project. If you want to create a new project, click on Create Project.
 - BigQuery is automatically enabled in new projects. To activate BigQuery in a pre-existing project, click APIS & AUTH in the left navigation, then click APIs. Navigate to BigQuery API. If the status indicator says OFF, click the indicator once to switch it to ON.
 - Set up billing. BigQuery offers a free tier for queries, but other operations require billing to be set up before you can use the service.
-- Open [BigQuery Browser Tool](https://console.developers.google.com/)
-- Click `COMPOSE QUERY` button at top left and execute the following sample query with the tool to check you can access BigQuery (using a public dataset).
+- Open BigQuery Browser Tool (linked under the Big Data section of your project console)
+- Click `COMPOSE QUERY` button at top left and execute the following sample query with the tool to check you can access BigQuery.
 
 ```
 SELECT title FROM [publicdata:samples.wikipedia] WHERE REGEXP_MATCH(title, r'.*Query.*') LIMIT 100
@@ -65,6 +65,9 @@ $ bq mk -t bq_test.access_log ./schema.json
 
 ## Creating a Google Compute Engine instance
 
+- First you need to enable the "Google Compute Engine" API under the APIs
+  section of the APIs & Auth area of the project console.
+
 - Run the following command to create a GCE instance named `bq-test`. This will take around 30 secs.
 
 For more information about the features of GCE instances and their features,
@@ -97,7 +100,7 @@ $ sudo docker run -e GCP_PROJECT="YOUR_PROJECT_ID" -p 80:80 -t -i -d kazunori279
 
 This will launch and run a docker container preconfigured with nginx and fluentd. The contents of this Docker container are described in more detail below. We now want to generate some page views so that we can verify that fluentd is sending data to BigQuery.
 
-- Open [Google Developers Console](https://console.developers.google.com/project) on a browser, choose your project and select `Compute` - `Compute Engine` - `VM instances`.
+- Open [Google Developers Console](https://console.developers.google.com/project) in a browser, choose your project and select `Compute` - `Compute Engine` - `VM instances`.
 
 - Find `bq-test` GCE instance and click it's external IP link. On the dialog, select `Allow HTTP traffic` and click `Apply` to add the firewall rule. There will be an Activities dialog shown in the bottom right of the window with a message `Updating instance tags for "bq-test"`. (tags are used to associate firewall rules)
 
@@ -112,7 +115,11 @@ This will launch and run a docker container preconfigured with nginx and fluentd
 SELECT * FROM [bq_test.access_log] LIMIT 1000
 ```
 
-That's it! You've just confirmed that nginx access log events are collected by Fluentd, imported into BigQuery and visible in the Browser Tool. Later we will use the Apache Bench tool to generate more traffic.  This load can be scaled quite well, BigQuery can support up to 10K rows/sec by default per table (and you can extend it to 100K rows/sec by requesting).
+*Note: If you are moving quickly, the first query results may be empty.
+A BigQuery table has a warm-up time for the very first inserts. Once this is
+done, subsequent inserts happen nearly instantly.*
+
+That's it! You've just confirmed that nginx access log events are collected by Fluentd, imported into BigQuery and visible in the Browser Tool. You may use Apache Bench tool or etc to hit the web page with more traffic to see how Fluentd + BigQuery can handle high volume logs in real time. It can support up to 10K rows/sec by default (and you can extend it to 100K rows/sec by requesting).
 
 ## Using BigQuery Dashboard
 
@@ -140,7 +147,7 @@ To start using BigQuery Dashboard, follow the instruction below.
 4. On the Script editor, open `bq_query.gs`. Paste the copied URL on the place of `<<PLEASE PUT YOUR SPREADSHEET URL HERE>>`. Select `File` - `Save` menu to save the file
 5. Paste Project ID of your Google Cloud Platform project on the place of `<<PLEASE PUT YOUR PROJECT ID HERE>>`. Select `File` - `Save` menu to save the file
 6. Select `Resources` - `Advanced Google services` menu and turn on `BigQuery API`
-7. Click `Google Developers Console` link on the dialog. This will show a list of APIs. Find `BigQuery API` and toggle permissions widget from `OFF` to `ON` to enable access. You will see `BigQuery API` on the `Enabled APIs` list on the top of the page
+7. Click `Google Developers Console` link on the dialog. This will show a list of APIs. Find `BigQuery API` and toggle permissions widget from `OFF` to `ON` to enable access. You should see `BigQuery API` on the `Enabled APIs` list on the top of the page, if not enable that here.
 8. Close the Console, click `OK` button in the dialog
 
 ### Execute a sample query:
@@ -148,9 +155,9 @@ To start using BigQuery Dashboard, follow the instruction below.
 Now it's ready to execute BigQuery queries from the spreadsheet. Use the following instructions to try executing a sample query.
 
 1. Open the spreadsheet and open `BQ Queries` sheet. The sheet has a sample BQ query named `gsod_temparature_LINE` which aggregates temparature data of each year from the public GSOD dataset available on BigQuery
-2. Select `Dashboard` - `Run All BQ Queries` menu. For the first time, it will show a dialog `Authorization Required`. Click `Continue` button and then `Accept` button
+2. Select `Dashboard` - `Run All BQ Queries` menu. When run the first time, it will show a dialog `Authorization Required`. Click `Continue` button and then `Accept` button
 3. There will be a `gsod_template` sheet added. Open the sheet and check there are the query results
-4. Open the `Lambda Dashboard` sheet and check there is a graph added for the query results
+4. Open the `BigQuery Dashboard` sheet and check there is a graph added for the query results.
 
 ### Query the fluentd data
 

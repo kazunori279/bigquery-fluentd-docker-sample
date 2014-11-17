@@ -12,7 +12,7 @@ The logs collected by Fluentd can be aggregated by BigQuery, and visualized by B
 
 ## Sign Up for Google Cloud Platform
 
-(You can skip this section if you have done before)
+(You can skip this section if you have already set up a Google Cloud Project)
 
 - If you don't already have one, sign up for a [Google account](https://accounts.google.com/SignUp).
 - Go to the [Google Developers Console](https://console.developers.google.com/?_ga=1.200477227.420342054.1415120486).
@@ -20,7 +20,7 @@ The logs collected by Fluentd can be aggregated by BigQuery, and visualized by B
 - BigQuery is automatically enabled in new projects. To activate BigQuery in a pre-existing project, click APIS & AUTH in the left navigation, then click APIs. Navigate to BigQuery API. If the status indicator says OFF, click the indicator once to switch it to ON.
 - Set up billing. BigQuery offers a free tier for queries, but other operations require billing to be set up before you can use the service.
 - Open [BigQuery Browser Tool](https://console.developers.google.com/)
-- Click `COMPOSE QUERY` button at top left and execute the following sample query with the tool to check you can access BigQuery.
+- Click `COMPOSE QUERY` button at top left and execute the following sample query with the tool to check you can access BigQuery (using a public dataset).
 
 ```
 SELECT title FROM [publicdata:samples.wikipedia] WHERE REGEXP_MATCH(title, r'.*Query.*') LIMIT 100
@@ -81,7 +81,7 @@ $ gcloud compute instances create "bq-test" \
 --image-project google-containers
 ```
 
-## Run nginx + Fluentd with Docker container
+## Run nginx + Fluentd with a Docker container
 
 - Enter the following command to log in to the GCE instance.
 
@@ -95,16 +95,13 @@ $ gcloud compute ssh bq-test --zone=us-central1-a
 $ sudo docker run -e GCP_PROJECT="YOUR_PROJECT_ID" -p 80:80 -t -i -d kazunori279/fluentd-bigquery-sample
 ```
 
-This will launch a run a docker container preconfigured with nginx and fluentd,
-this docker container is described in more detail below. We now want to
-generate some page views so that we can verify that fluentd is sending data to
-BigQuery.
+This will launch and run a docker container preconfigured with nginx and fluentd. The contents of this Docker container are described in more detail below. We now want to generate some page views so that we can verify that fluentd is sending data to BigQuery.
 
 - Open [Google Developers Console](https://console.developers.google.com/project) on a browser, choose your project and select `Compute` - `Compute Engine` - `VM instances`.
 
-- Find `bq-test` GCE instance and click it's external IP link. On the dialog, select `Allow HTTP traffic` and click `Apply` to add the firewall rule. There will be an Activities dialog shown in the bottom right of the window with a message `Updating instance tags for "bq-test"`.
+- Find `bq-test` GCE instance and click it's external IP link. On the dialog, select `Allow HTTP traffic` and click `Apply` to add the firewall rule. There will be an Activities dialog shown in the bottom right of the window with a message `Updating instance tags for "bq-test"`. (tags are used to associate firewall rules)
 
-- After updating instance tags, click the external IP link again to direct your browser to hit the nginx server on the instance. It will show a blank web page titled "Welcome to nginx!". Click reload button several times.
+- After updating, click the external IP link again to direct your browser to hit the nginx server on the instance. It will show a blank web page titled "Welcome to nginx!". Click reload button several times.
 
 
 ## Execute BigQuery query
@@ -115,12 +112,11 @@ BigQuery.
 SELECT * FROM [bq_test.access_log] LIMIT 1000
 ```
 
-That's it! You've just confirmed that nginx access log events are collected by Fluentd, imported into BigQuery and visible in the Browser Tool. You may use Apache Bench tool or etc to hit the web page with more traffic to see how Fluentd + BigQuery can handle high volume logs in real time. It can support up to 10K rows/sec by default (and you can extend it to 100K rows/sec by requesting).
+That's it! You've just confirmed that nginx access log events are collected by Fluentd, imported into BigQuery and visible in the Browser Tool. Later we will use the Apache Bench tool to generate more traffic.  This load can be scaled quite well, BigQuery can support up to 10K rows/sec by default per table (and you can extend it to 100K rows/sec by requesting).
 
 ## Using BigQuery Dashboard
 
-
-Using Google Sheets and the BigQuery connector, you can create a BigQuery Dashboard which lets you easily write and visualize queries and have them update periodically (e.g. every minute, hour, or day).
+Using Google Sheets and the BigQuery connector, you can create a BigQuery Dashboard which lets you easily store and visualize queries and have them update periodically automatically (e.g. every minute, hour, or day).
 
 ### Features
 
@@ -158,6 +154,8 @@ Now it's ready to execute BigQuery queries from the spreadsheet. Use the followi
 
 ### Query the fluentd data
 
+- Add the following query on `BQ Queries` sheet with a query name `access_log_LINE` and interval `1` min.
+
 ```
 SELECT
   STRFTIME_UTC_USEC(time * 1000000, "%Y-%m-%d %H:%M:%S") as tstamp, 
@@ -165,8 +163,6 @@ SELECT
 FROM bq_test.access_log
 GROUP BY tstamp ORDER BY tstamp DESC;
 ```
-
-- Add the following query on `BQ Queries` sheet with a query name `access_log_LINE` and interval `1` min.
 
 ### Automatic query execution:
 
@@ -180,15 +176,15 @@ If you want to execute the queries periodically, use the following instructions.
 With this setting, the sample query will be executed every one minute. Set `0` to the `interval (min)` to disable the periodical execution.
 
 
-### Generating a simulated load
+### Simulating load
 
-- (assuming you are using Mac OS or Linux) Open a local terminal and execute the following command to execute Apache Bench to hit the nginx with high traffic. Replace `YOUR_EXTERNAL_IP` with the external IP of the GCE instance.
+- (assuming you are using Mac OS or Linux) Open a local terminal and execute the following command to execute Apache Bench to hit the nginx server with simulated traffic. Replace `YOUR_EXTERNAL_IP` with the external IP of the GCE instance.
 
 ```
 ab -c 100 -n 1000000 http://YOUR_EXTERNAL_IP/
 ```
 
-- Open the `BigQuery Dashboard` and select `Dashboard` - `Run All BQ Queries` on the menu. You will see a graph `access_log` is drawn on the dashboard. This graph will be refreshed every one minute.
+- Open the `BigQuery Dashboard` and select `Dashboard` - `Run All BQ Queries` on the menu. You will see a graph `access_log` is drawn on the dashboard. This graph will be refreshed every minute.
 
 ![access_log graph](images/access_log_graph.png)
 

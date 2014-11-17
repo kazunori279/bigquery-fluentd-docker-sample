@@ -6,9 +6,7 @@ This sample explains how to set up a [Fluentd](http://www.fluentd.org/) + [Googl
 - Creating a dataset and table on Google BigQuery
 - Run nginx + Fluentd on Google Compute Engine (GCE) in a Docker container
 - Execute BigQuery query
-- (Optional) Using BigQuery Dashboard built with Google Sheets
-
-The logs collected by Fluentd can be aggregated by BigQuery, and visualized by BigQuery Dashboard easily:
+- Using BigQuery Dashboard built with Google Sheets
 
 ## Sign Up for Google Cloud Platform
 
@@ -171,16 +169,20 @@ FROM bq_test.access_log
 GROUP BY tstamp ORDER BY tstamp DESC;
 ```
 
+*Note: paste this query into the top data entry box, not the cell, otherwise the
+lines of the Query may paste each into their own cell*
+
 ### Automatic query execution:
+
 
 If you want to execute the queries periodically, use the following instructions.
 
-1. Open the Script editor and select `Resources` - `Current project's triggers`
+1. Open the Tools > Script editor and select `Resources` - `Current project's triggers`
 2. Click `Click here to add one now`
 3. Select `runQueries` for `Run` menu, and select `Time-driven` `Minutes timer` `Every minute` for `Events`, and click `Save`
 4. Go back to `BQ Queries` sheet, set `1` to the `interval (min)` column of the `gsod_temperature_LINE` query
 
-With this setting, the sample query will be executed every one minute. Set `0` to the `interval (min)` to disable the periodical execution.
+With this setting, the queries will be executed once every minute. Set `0` to the `interval (min)` to disable the periodic execution.
 
 
 ### Simulating load
@@ -191,7 +193,7 @@ With this setting, the sample query will be executed every one minute. Set `0` t
 ab -c 100 -n 1000000 http://YOUR_EXTERNAL_IP/
 ```
 
-- Open the `BigQuery Dashboard` and select `Dashboard` - `Run All BQ Queries` on the menu. You will see a graph `access_log` is drawn on the dashboard. This graph will be refreshed every minute.
+- Open the `BigQuery Dashboard` and select `Dashboard` - `Run All BQ Queries` on the menu to see the graph `access_log` drawn on the dashboard sheet. If you followed the steps for automatic execution you will see this graph refresh every minute.
 
 ![access_log graph](images/access_log_graph.png)
 
